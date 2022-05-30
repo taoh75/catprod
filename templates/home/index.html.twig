@@ -1,0 +1,60 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}CATPROD - INICIO{% endblock %}
+
+{% block body %}
+<!-- SE INCLUYE LA BARRA DE NAVEGACION PRINCIPAL -->
+    <nav class="navbar navbar-expand-sm navbar-dark bg-dark" aria-label="Third navbar example">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="#">CATPROD 1.0</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarsExample03" aria-controls="navbarsExample03" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarsExample03">
+                <ul class="navbar-nav me-auto mb-2 mb-sm-0">
+                    <li class="nav-item">
+                        <a class="nav-link active" aria-current="page" href="/">Inicio</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#">Categorías</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#">Productos</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+    <!-- CONTENIDO DE LA PÁGINA PRINCIPAL -->
+<div class="container">
+    <header class="p-3 mb-4 border-bottom">
+        <a href="/" class="d-flex align-items-center text-dark text-decoration-none">
+            <span class="fs-4">Ejemplo de Symfony</span>
+        </a>
+    </header>
+
+    <div class="p-5 mb-4 bg-light rounded-3">
+        <div class="container-fluid py-3">
+            <h1 class="display-5 fw-bold">Gestión de Categorías y Productos</h1>
+            <p class="col-md-8 fs-4">A través de esta aplicación podemos administrar los productos y categorías registradas en el sistema</p>
+        </div>
+    </div>
+
+    <div class="row align-items-md-stretch">
+        <div class="col-md-6">
+            <div class="h-100 p-5 text-white bg-dark rounded-3">
+                <h2>Administración de Categorías</h2>
+                <p>Crea, Modifica, Elimina o Selecciona las categorías en el sistema</p>
+                <button class="btn btn-outline-light" type="button">Categorías</button>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="h-100 p-5 bg-light border rounded-3">
+                <h2>Administración de Productos</h2>
+                <p>Gestiona los Productos registrados en el sistema, paso previo a la adminitración de inventarios</p>
+                <button class="btn btn-outline-secondary" type="button">Productos</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
