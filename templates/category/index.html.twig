@@ -41,7 +41,6 @@
             <tr>
                 <th class="text-center">Categoría</th>
                 <th width="180px" class="text-center">Estado</th>
-                <th width="250px" class="text-center">Marca Temp.</th>
                 <th width="180px" class="text-center">Opciones</th>
             </tr>
             </thead>
@@ -57,10 +56,6 @@
                     <td>{{ cat.name|e }}</td>
                     <td class="text-center">{{ ((cat.active)?'<span class="text-success"><i class="bi bi-check-circle"></i> Activo<span>'
                         :'<span class="text-danger"><i class="bi bi-exclamation-circle"></i> Inactivo</span>') }}</td>
-                    <td>
-                        <i class="bi bi-calendar-plus"></i> F.C. {{ cat.createdAt|date('Y-m-d H:i:s') }}<br>
-                        <i class="bi bi-calendar2-check"></i> F.M. {{ cat.updatedAt|date('Y-m-d H:i:s') }}
-                    </td>
                     <td class="text-center">
                         <a class="btn btn-outline-primary btn-sm" href="{{ path('category_update',{'id':cat.id}) }}">Editar</a>
                         <button class="btn btn-outline-danger btn-sm" onclick="delete_category({{ cat.id }},`{{ cat.name }}`)">Borrar</button>

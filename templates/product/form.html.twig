@@ -1,0 +1,68 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}CATPROD - Productos{% endblock %}
+
+{% block body %}
+    <div class="container py-3">
+        <div class="float-end">
+            <button type="submit" form="frmProducts" class="btn btn-outline-success btn-sm">
+                <i class="bi bi-plus-square"></i>
+                Guardar Producto
+            </button>
+            <a class="btn btn-outline-danger btn-sm" href="/products">
+                <i class="bi bi-x-square"></i> Cerrar
+            </a>
+        </div>
+        <h3><i class="bi bi-pencil-square"></i>  Producto</h3>
+        <hr>
+        <form method="post" id="frmProducts" name="frmProducts" action="/products/store">
+            <input type="hidden" id="product-id" name="id" value="{{ product.id??0 }}">
+            <div class="row">
+                <div class="col-12 col-sm-6 col-md-4 py-1">
+                    <label for="product-code">Código</label>
+                    <input required type="text" id="product-code" name="code" class="form-control" placeholder="Código" value="{{ product.code??'' }}">
+                </div>
+                <div class="col-12 col-sm-6 col-md-8 py-1">
+                    <label for="product-code">Nombre</label>
+                    <input required type="text" id="product-name" name="name" class="form-control" placeholder="Nombre" value="{{ product.name??'' }}">
+                </div>
+                <div class="col-12 py-1">
+                    <label for="product-desc">Description</label>
+                    <textarea name="description" id="product-desc" class="form-control">{{ product.description??'' }}</textarea>
+                </div>
+                <div class="col-6 col-md-3 py-1">
+                    <label for="product-price">Precio del Producto</label>
+                    <input required min="0.01" type="number" step="0.01" class="form-control text-end" id="product-price" name="price" value="{{ product.price??0.00 }}">
+                </div>
+                <div class="col-6 col-md-3 py-1">
+                    <label for="product-code">Marca</label>
+                    <input required type="text" id="product-brand" name="brand" class="form-control" placeholder="Marca" value="{{ product.brand??'' }}">
+                </div>
+                <div class="col-6 col-md-3 py-1">
+                    <label for="product-price">Categoría</label>
+                    <!-- En la línea de option verifica si existe un producto, si lo encuentra verifica la categoria -->
+                    <select name="category" id="product-category" class="form-control">
+                        {% for cat in categories %}
+                            <option value="{{ cat.id }}" {{ ((product==null)?'':((cat.id==product.category.id)?'selected':'')) }}>{{ cat.name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-6 col-md-3 py-2">
+                    <div class="form-check form-switch" style="padding-top:25px">
+                        <input class="form-check-input" type="checkbox" role="switch" id="product-active" name="active" {{ (((product!=null) and (product.active))?'checked':'') }}>
+                        <label class="form-check-label" for="category_active">Producto Activo</label>
+                    </div>
+                </div>
+            </div>
+        </form>
+        <!-- TABLA DE PRODUCTOS -->
+        <script>
+            function delete_product(id=0,name=``){
+                document.getElementById('cat-Name').innerHTML=name;
+                document.getElementById('category-id-delete').value=id;
+                var Modal = new bootstrap.Modal(document.getElementById('msgDeleteCategory'));
+                Modal.show();
+            }
+        </script>
+    </div>
+{% endblock %}

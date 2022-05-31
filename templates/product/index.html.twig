@@ -1,0 +1,122 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}CATPROD - Productos{% endblock %}
+
+{% block body %}
+    <div class="container py-3">
+        <!-- MODAL PARA VERIFICAR SI SE QUIERE ELIMINAR EL PRODUCTO -->
+        <!-- La función para llamar al modal se encuentra en la parte final de esta pantalla -->
+        <div id="msgDeleteProduct" class="modal" tabindex="-1">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Eliminar Producto</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <p>Confirme que desea eliminar el producto <b><span id="prod-Name"></span></b></p>
+                        <!-- Contiene el ID de la categoria para eliminar -->
+                        <input type="hidden" id="prod-id-delete" value="0">
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                        <button type="button" class="btn btn-primary" onclick="window.location.href=`product/delete/`+document.getElementById('prod-id-delete').value;">Aceptar</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- MODAL PARA VERIFICAR SI SE QUIERE ELIMINAR LA CATEGORÍA -->
+        <!-- MODAL PARA FILTRAR LOS PRODUCTOS -->
+        <!-- La función para llamar al modal se encuentra en la parte final de esta pantalla -->
+        <div id="msgSrchProduct" class="modal" tabindex="-1">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Buscar Producto</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <!-- Formulario de Búsqueda -->
+                        <form action=""></form>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                        <button type="button" class="btn btn-primary" onclick="">Aceptar</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- MODAL PARA FILTRAR LOS PRODUCTOS -->
+        <div class="float-end">
+            <a class="btn btn-outline-success btn-sm" href="products/create/">
+                <i class="bi bi-plus-square"></i>
+                Crear Producto
+            </a>
+            <a class="btn btn-outline-success btn-sm" href="products/new/">
+                Nuevo Producto
+            </a>
+            <button class="btn btn-outline-primary btn-sm" type="button" title="Buscar Producto">
+                <i class="bi bi-binoculars"></i>
+            </button>
+            <button class="btn btn-outline-primary btn-sm" type="button" title="Exportar Tabla">
+                <i class="bi bi-box-arrow-up-right"></i>
+            </button>
+            <a class="btn btn-outline-danger btn-sm" href="/">
+                <i class="bi bi-x-square"></i> Cerrar
+            </a>
+        </div>
+        <h3>Administración de Productos</h3>
+        <hr>
+        <table class="table table-bordered">
+            <thead>
+            <tr>
+                <th class="text-center">Producto</th>
+                <th class="text-center">Categoría</th>
+                <th class="text-center">Precio</th>
+                <th width="250px" class="text-center">Estado</th>
+                <th width="180px" class="text-center">Opciones</th>
+            </tr>
+            </thead>
+            <tbody>
+            {% if products|length ==0  %}
+                <tr>
+                    <td colspan="5" class="text-center">
+                        <i class="bi bi-info-circle-fill"></i> No existen registros con el criterio especificado
+                    </td>
+                </tr>
+            {% else %}
+                {% for prod in products %}
+                    <tr>
+                        <td><small>{{ prod.code }}<br></small>{{ prod.name }}</td>
+                        <td>{{ prod.category.name }}</td>
+                        <td class="text-end">$ {{ prod.price|number_format(2,',','.') }}</td>
+                        <td>
+                            {{ ((prod.active)?'<span class="text-success"><i class="bi bi-check-circle"></i> Activo</span>': '<span class="text-danger"><i class="bi bi-info-circle-fill"></i> Inactivo</span>') }}<br>
+                            <i class="bi bi-calendar-date"></i> {{ prod.updatedAt|date('Y-m-d H:i:s') }}
+                        </td>
+                        <td class="text-center">
+                            <a class="btn btn-outline-primary btn-sm" title="Editar Producto" href="product/{{ prod.id }}">
+                                <i class="bi bi-pencil-square"></i>
+                            </a>
+                            <a class="btn btn-outline-primary btn-sm" title="Actualizar Producto" href="products/update/{{ prod.id }}">
+                                <i class="bi bi-pencil"></i>
+                            </a>
+                            <button class="btn btn-outline-danger btn-sm" title="Eliminar Producto" onclick="delete_product({{ prod.id }},`{{ prod.name }}`)">
+                                <i class="bi bi-trash"></i>
+                            </button>
+                        </td>
+                    </tr>
+                {% endfor %}
+            {%  endif %}
+            </tbody>
+        </table>
+        <script>
+            function delete_product(id=0,name=``){
+                document.getElementById('prod-Name').innerHTML=name;
+                document.getElementById('prod-id-delete').value=id;
+                var Modal = new bootstrap.Modal(document.getElementById('msgDeleteProduct'));
+                Modal.show();
+            }
+        </script>
+    </div>
+{% endblock %}
