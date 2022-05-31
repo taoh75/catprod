@@ -1,0 +1,40 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}CATPROD - Categorías{% endblock %}
+
+{% block body %}
+<div class="container py-3">
+    <div class="float-end">
+        <button type="submit" form="frmCategory" class="btn btn-outline-primary btn-sm">
+            <i class="bi bi-save"></i>
+            Guardar
+        </button>
+        <a class="btn btn-outline-danger btn-sm" href="/category">
+            Cerrar
+        </a>
+    </div>
+    <h3>{{ ((categoryId==0)?"Crear ":"Editar ") }} Categoría</h3>
+    <hr>
+    <form method="POST" id="frmCategory" name="frmCategory" action="/category/store">
+        <input type="hidden" id="category_id" name="id" value="{{ category.id }}">
+        <div class="row py-2">
+            <div class="col-12 p-2">
+                <label for="category_name">Nombre de la Categoría</label>
+                <input required value="{{ category.name }}" id="category_name" name="name" type="text" class="form-control" placeholder="Nombre de Categoría">
+            </div>
+            <div class="col-12 p-2">
+                <div class="form-check form-switch">
+                    <input class="form-check-input" type="checkbox" role="switch" id="category_active" name="active" {{ ((category.active)?'checked':'') }}>
+                    <label class="form-check-label" for="category_active">Categoría Activa</label>
+                </div>
+            </div>
+            {% if categoryId>0 %}
+            <div class="col-12 p-2">
+                <i class="bi bi-calendar-day"></i> F. Creación {{ category.createdAt|date('Y-m-d H:i:s') }} <br>
+                <i class="bi bi-calendar-day"></i> F. Modificación {{ category.updatedAt|date('Y-m-d H:i:s') }}
+            </div>
+            {% endif %}
+        </div>
+    </form>
+</div>
+{% endblock %}

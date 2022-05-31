@@ -1,0 +1,81 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}CATPROD - Categorías{% endblock %}
+
+{% block body %}
+    <div class="container py-3">
+        <!-- MODAL PARA VERIFICAR SI SE QUIERE ELIMINAR LA CATEGORÍA -->
+        <!-- La función para llamar al modal se encuentra en la parte final de esta pantalla -->
+        <div id="msgDeleteCategory" class="modal" tabindex="-1">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Eliminar</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <p>Confirme que desea eliminar la categoria <span id="cat-Name"></span></p>
+                        <!-- Contiene el ID de la categoria para eliminar -->
+                        <input type="hidden" id="category-id-delete" value="0">
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                        <button type="button" class="btn btn-primary" onclick="window.location.href=`category/delete/`+document.getElementById('category-id-delete').value;">Aceptar</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- MODAL PARA VERIFICAR SI SE QUIERE ELIMINAR LA CATEGORÍA -->
+        <div class="float-end">
+            <a class="btn btn-outline-success btn-sm" href="/category/create">
+                Nueva
+            </a>
+            <a class="btn btn-outline-danger btn-sm" href="/">
+                Cerrar
+            </a>
+        </div>
+        <h3>Administración de Categorías</h3>
+        <hr>
+        <table class="table table-bordered">
+            <thead>
+            <tr>
+                <th class="text-center">Categoría</th>
+                <th width="180px" class="text-center">Estado</th>
+                <th width="250px" class="text-center">Marca Temp.</th>
+                <th width="180px" class="text-center">Opciones</th>
+            </tr>
+            </thead>
+            <tbody>
+            {% if categories|length==0 %}
+                <tr>
+                    <td colspan="2"><b><i class="bi bi-exclamation-diamond"></i> No se encontraron registros que mostrar</b>
+                    </td>
+                </tr>
+            {% endif %}
+            {% for cat in categories %}
+                <tr>
+                    <td>{{ cat.name|e }}</td>
+                    <td class="text-center">{{ ((cat.active)?'<span class="text-success"><i class="bi bi-check-circle"></i> Activo<span>'
+                        :'<span class="text-danger"><i class="bi bi-exclamation-circle"></i> Inactivo</span>') }}</td>
+                    <td>
+                        <i class="bi bi-calendar-plus"></i> F.C. {{ cat.createdAt|date('Y-m-d H:i:s') }}<br>
+                        <i class="bi bi-calendar2-check"></i> F.M. {{ cat.updatedAt|date('Y-m-d H:i:s') }}
+                    </td>
+                    <td class="text-center">
+                        <a class="btn btn-outline-primary btn-sm" href="{{ path('category_update',{'id':cat.id}) }}">Editar</a>
+                        <button class="btn btn-outline-danger btn-sm" onclick="delete_category({{ cat.id }},`{{ cat.name }}`)">Borrar</button>
+                    </td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+        <script>
+            function delete_category(id=0,name=``){
+                document.getElementById('cat-Name').innerHTML=name;
+                document.getElementById('category-id-delete').value=id;
+                var Modal = new bootstrap.Modal(document.getElementById('msgDeleteCategory'));
+                Modal.show();
+            }
+        </script>
+    </div>
+{% endblock %}
