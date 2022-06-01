@@ -26,6 +26,37 @@
             </div>
         </div>
         <!-- MODAL PARA VERIFICAR SI SE QUIERE ELIMINAR LA CATEGORÍA -->
+        <!-- MODAL PARA EXPORTAR LA LISTA DE PRODUCTOS -->
+        <!-- La función para llamar al modal se encuentra en la parte final de esta pantalla -->
+        <div id="msgExportProduct" class="modal" tabindex="-1">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Exportar Productos</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="m-2 text-center">
+                            <button type="button" class="btn btn-outline-primary">
+                                <i class="bi bi-printer"></i>
+                            </button>
+                            <button type="button" class="btn btn-outline-success">
+                                <i class="bi bi-file-earmark-excel"></i>
+                            </button>
+                        </div>
+                        <div class="m-2 text-center">
+                            <label for="">Envía el Archivo por Correo Electrónico</label>
+                            <input type="email" id="product-export-email" name="email" class="form-control">
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                        <button type="button" class="btn btn-primary" onclick="window.location.href=`product/delete/`+document.getElementById('prod-id-delete').value;">Aceptar</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- MODAL PARA VERIFICAR SI SE QUIERE ELIMINAR LA CATEGORÍA -->
         <!-- MODAL PARA FILTRAR LOS PRODUCTOS -->
         <!-- La función para llamar al modal se encuentra en la parte final de esta pantalla -->
         <div id="msgSrchProduct" class="modal" tabindex="-1">
@@ -36,29 +67,71 @@
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
                     <div class="modal-body">
-                        <!-- Formulario de Búsqueda -->
-                        <form action=""></form>
+                        <form id="frmSrchProducts" name="frmSrchProducts" method="post" action="/products">
+                            <div class="row">
+                                <div class="col-12 my-1">
+                                    <input value="{{ req.get('name')??'' }}" id="srch-product-name" name="name" type="text" class="form-control" placeholder="Código | Nombre | Descripción | Marca">
+                                </div>
+                                <div class="col-12 my-1">
+                                    <select id="srch-product-category" name="category" class="form-control">
+                                        <option value="0">Seleccione una Categoria</option>
+                                        {% for cat in categories %}
+                                            <option value="{{ cat.id }}" {{ ((req.get('category')==cat.id)?'selected':'') }}>{{ cat.name }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                                <div class="col-12 my-2">
+                                    <select id="srch-product-active" name="active" class="form-control">
+                                        <option value="0" {{ ((req.get('active')>0)?'':'selected') }}>Todos los Estados</option>
+                                        <option value="1" {{ ((req.get('active')==1)?'selected':'') }}>Productos Activos</option>
+                                        <option value="2" {{ ((req.get('active')==2)?'selected':'') }}>Productos Inactivos</option>
+                                    </select>
+                                </div>
+                                <div class="col-12 my-2">
+                                    <label for="">Ordernar Por</label>
+                                    <select id="srch-product-orderby" name="orderby" class="form-control">
+                                        <option value="id">ID</option>
+                                        <option value="code">Código</option>
+                                        <option value="name">Nombre</option>
+                                        <option value="brand">Marca</option>
+                                        <option value="price">Precio</option>
+                                    </select>
+                                </div>
+                                <div class="col-12 my-2">
+                                    <select id="srch-product-orn" name="orn" class="form-control">
+                                        <option value="ASC">Ascendente</option>
+                                        <option value="DESC" selected>Descendente</option>
+                                    </select>
+                                </div>
+                                <div class="col-12 my-2">
+                                    <button type="submit" onsubmit="document.getElementById('frmSrchProducts')[0].reset();" class="btn btn-outline-warning">Borrar Filtro</button>
+                                </div>
+                            </div>
+                        </form>
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
-                        <button type="button" class="btn btn-primary" onclick="">Aceptar</button>
+                        <button type="submit" form="frmSrchProducts" class="btn btn-primary">Aceptar</button>
                     </div>
                 </div>
             </div>
         </div>
         <!-- MODAL PARA FILTRAR LOS PRODUCTOS -->
         <div class="float-end">
+            <!-- ESTE BOTÓN ACTIVA EL MODO SIN FORMULARIO
             <a class="btn btn-outline-success btn-sm" href="products/create/">
                 <i class="bi bi-plus-square"></i>
                 Crear Producto
             </a>
+            -->
             <a class="btn btn-outline-success btn-sm" href="products/new/">
+                <i class="bi bi-plus-square"></i>
                 Nuevo Producto
             </a>
-            <button class="btn btn-outline-primary btn-sm" type="button" title="Buscar Producto">
+            <button class="btn btn-outline-primary btn-sm" type="button" title="Buscar Producto" onclick="buscar_producto()">
                 <i class="bi bi-binoculars"></i>
             </button>
-            <button class="btn btn-outline-primary btn-sm" type="button" title="Exportar Tabla">
+            <button class="btn btn-outline-primary btn-sm" type="button" onclick="export_product()" title="Exportar Tabla">
                 <i class="bi bi-box-arrow-up-right"></i>
             </button>
             <a class="btn btn-outline-danger btn-sm" href="/">
@@ -66,6 +139,15 @@
             </a>
         </div>
         <h3>Administración de Productos</h3>
+        <p>
+            {% if previous>=0 %}
+                <a href="{{ path('app_product', {offset: previous}) }}" class="btn btn-outline-primary btn-sm mr-1"><< Atrás</a>
+            {% endif %}
+            Página {{ pagina }}
+            {% if next>=0 and next<products|length %}
+                <a href="{{ path('app_product', {offset: next}) }}" class="btn btn-outline-primary btn-sm">Próximo >></a>
+            {% endif %}
+        </p>
         <hr>
         <table class="table table-bordered">
             <thead>
@@ -91,13 +173,14 @@
                         <td>{{ prod.category.name }}</td>
                         <td class="text-end">$ {{ prod.price|number_format(2,',','.') }}</td>
                         <td>
-                            {{ ((prod.active)?'<span class="text-success"><i class="bi bi-check-circle"></i> Activo</span>': '<span class="text-danger"><i class="bi bi-info-circle-fill"></i> Inactivo</span>') }}<br>
+                            {{ ((prod.active=='1')?'<span class="text-success"><i class="bi bi-check-circle"></i> Activo</span>': '<span class="text-danger"><i class="bi bi-info-circle-fill"></i> Inactivo</span>') }}<br>
                             <i class="bi bi-calendar-date"></i> {{ prod.updatedAt|date('Y-m-d H:i:s') }}
                         </td>
                         <td class="text-center">
+                            <!-- ESTE BOTÓN ACTIVA EL MODO SIN FORMULARIO
                             <a class="btn btn-outline-primary btn-sm" title="Editar Producto" href="product/{{ prod.id }}">
                                 <i class="bi bi-pencil-square"></i>
-                            </a>
+                            </a> -->
                             <a class="btn btn-outline-primary btn-sm" title="Actualizar Producto" href="products/update/{{ prod.id }}">
                                 <i class="bi bi-pencil"></i>
                             </a>
@@ -115,6 +198,14 @@
                 document.getElementById('prod-Name').innerHTML=name;
                 document.getElementById('prod-id-delete').value=id;
                 var Modal = new bootstrap.Modal(document.getElementById('msgDeleteProduct'));
+                Modal.show();
+            }
+            function buscar_producto(){
+                var Modal = new bootstrap.Modal(document.getElementById('msgSrchProduct'));
+                Modal.show();
+            }
+            function export_product(){
+                var Modal = new bootstrap.Modal(document.getElementById('msgExportProduct'));
                 Modal.show();
             }
         </script>

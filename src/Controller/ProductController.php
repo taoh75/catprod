@@ -14,21 +14,30 @@ use Symfony\Component\Routing\Annotation\Route;
 
 class ProductController extends AbstractController
 {
-    #[Route('/products', name: 'app_product', methods: ['GET'])]
-    public function index(ProductRepository $repo): Response
+    #[Route('/products', name: 'app_product', methods: ['GET','POST'])]
+    public function index(CategoryRepository $catRepo, ProductRepository $repo, Request $request): Response
     {
-        $products = $repo->findAll();
+        $categories=$catRepo->findBy(['active'=>true,'active'=>1]);
+        $offset=max(0,$request->query->getInt('offset',0));
+        $paginator = $repo->getProductPaginator($offset,$request);
         return $this->render('product/index.html.twig', [
-            'products' => $products,
+            'products' => $paginator,
+            'categories' => $categories,
+            'offset' => $offset,
+            'previous' => $offset - $repo::PAGINATOR_PER_PAGE,
+            'next' => min(count($paginator), $offset + $repo::PAGINATOR_PER_PAGE),
+            'pagina' => ceil($offset/$repo::PAGINATOR_PER_PAGE)+1,
+            'req' => $request
         ]);
     }
+    //MODO SIN FORMULARIO
     #[Route('/products/create', name: 'create_product',methods: ['GET'])]
     public function create(CategoryRepository $categoryRepo): Response
     {
         $categories = $categoryRepo->findBy(['active'=>true,'active'=>1]);
         return $this->render('product/form.html.twig',['product'=>null,'categories'=>$categories]);
     }
-
+    //MODO SIN FORMULARIO
     #[Route('/product/{id}', name: 'edit_product',methods: ['GET'])]
     public function edit(CategoryRepository $categoryRepo, ProductRepository $repo, $id=0): Response
     {
@@ -36,7 +45,7 @@ class ProductController extends AbstractController
         $product    = $repo->findOneBy(['id' => $id]);
         return $this->render('product/form.html.twig',['product'=>$product,'categories'=>$categories]);
     }
-
+    //GUARDAR MODO SIN FORMULARIO
     #[Route('/products/store', name: 'store_product',methods: ['POST'])]
     public function store(Request $req, ProductRepository $repo, CategoryRepository $catRepo): Response
     {
@@ -58,7 +67,7 @@ class ProductController extends AbstractController
         $repo->add($product,true);
         return $this->redirect('/products');
     }
-
+    //BORRAR NO REQUIERE FORMULARIO
     #[Route('/product/delete/{id}', name: 'delete_product',methods: ['GET'])]
     public function delete(ProductRepository $repo, $id=0): Response
     {
@@ -66,7 +75,6 @@ class ProductController extends AbstractController
         $repo->remove($product,true);
         return $this->redirect('/products');
     }
-
     //ESTA RUTA MUESTRA LA PANTALLA DE CREACIÓN DE UN PRODUCTO CON EL BUILDER FORM
     #[Route('/products/new', name: 'new_product',methods: ['GET','POST'])]
     public function new(Request $request, ProductRepository $repo): Response

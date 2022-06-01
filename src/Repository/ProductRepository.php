@@ -5,6 +5,8 @@ namespace App\Repository;
 use App\Entity\Product;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
+use Doctrine\ORM\Tools\Pagination\Paginator;
+use Symfony\Component\HttpFoundation\Request;
 
 /**
  * @extends ServiceEntityRepository<Product>
@@ -16,6 +18,8 @@ use Doctrine\Persistence\ManagerRegistry;
  */
 class ProductRepository extends ServiceEntityRepository
 {
+    public const PAGINATOR_PER_PAGE = 10;
+
     public function __construct(ManagerRegistry $registry)
     {
         parent::__construct($registry, Product::class);
@@ -37,6 +41,34 @@ class ProductRepository extends ServiceEntityRepository
         if ($flush) {
             $this->getEntityManager()->flush();
         }
+    }
+
+    public function getProductPaginator(int $offset, Request $req): Paginator
+    {
+        $query = $this->createQueryBuilder('c');
+        if ($req->get('name') !='') {
+            $vname=explode("|",$req->get('name'));
+            foreach ($vname as $index => $value){
+                $query->andWhere('c.name LIKE :searchName'.$index);
+                $query->orWhere('c.code LIKE :searchName'.$index);
+                $query->orWhere('c.description LIKE :searchName'.$index);
+                $query->orWhere('c.brand LIKE :searchName'.$index);
+                $query->setParameter('searchName'.$index, '%'.trim($value).'%');
+            }
+        }
+        if ($req->get('category') > 0) {
+            $query->andWhere('c.category = :searchCat');
+            $query->setParameter('searchCat', $req->get('category'));
+        }
+        if ($req->get('active') > 0) {
+            $query->andWhere('c.active = :searchActive');
+            $query->setParameter('searchActive', (($req->get('active') == 1)?'1':'0'));
+        }
+        $query->orderBy('c.'.($req->get('orderby')??'id'), ($req->get('orn')??'DESC'));
+        $query->setMaxResults(self::PAGINATOR_PER_PAGE);
+        $query->setFirstResult($offset);
+        $query->getQuery();
+        return new Paginator($query);
     }
 
 //    /**

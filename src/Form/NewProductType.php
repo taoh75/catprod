@@ -8,10 +8,7 @@ use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ButtonType;
 use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
-use Symfony\Component\Form\Extension\Core\Type\DateTimeType;
-use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Form\Extension\Core\Type\NumberType;
-use Symfony\Component\Form\Extension\Core\Type\ResetType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
@@ -37,7 +34,7 @@ class NewProductType extends AbstractType
             ->add('description', TextareaType::class, ['label' => 'Descripción', 'attr' => ['class' => 'form-control mb-2']])
             ->add('brand', TextType::class, ['attr' => ['label' => 'Marca', 'class' => 'form-control mb-2']])
             ->add('price', NumberType::class, ['attr' => ['label' => 'Precio', 'class' => 'form-control mb-2']])
-            ->add('active', CheckboxType::class, ['label' => 'Producto Activo', 'attr' => ['checked' => true, 'style' => 'margin:15px;']])
+            ->add('active', CheckboxType::class, ['required'=>false, 'label' => 'Producto Activo', 'attr' => ['required'=>false,'style' => 'margin:15px;']])
             ->add('category', EntityType::class, [
                 'label' => 'Categoría',
                 'attr' => ['class' => 'form-control my-3'],
