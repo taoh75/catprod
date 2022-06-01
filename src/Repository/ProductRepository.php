@@ -71,6 +71,32 @@ class ProductRepository extends ServiceEntityRepository
         return new Paginator($query);
     }
 
+    public function getProductExport(Request $req): Array
+    {
+        $query = $this->createQueryBuilder('c');
+        if ($req->get('name') !='') {
+            $vname=explode("|",$req->get('name'));
+            foreach ($vname as $index => $value){
+                $query->andWhere('c.name LIKE :searchName'.$index);
+                $query->orWhere('c.code LIKE :searchName'.$index);
+                $query->orWhere('c.description LIKE :searchName'.$index);
+                $query->orWhere('c.brand LIKE :searchName'.$index);
+                $query->setParameter('searchName'.$index, '%'.trim($value).'%');
+            }
+        }
+        if ($req->get('category') > 0) {
+            $query->andWhere('c.category = :searchCat');
+            $query->setParameter('searchCat', $req->get('category'));
+        }
+        if ($req->get('active') > 0) {
+            $query->andWhere('c.active = :searchActive');
+            $query->setParameter('searchActive', (($req->get('active') == 1)?'1':'0'));
+        }
+        $query->orderBy('c.'.($req->get('orderby')??'id'), ($req->get('orn')??'DESC'));
+        $prods = $query->getQuery();
+        return $prods->execute();
+    }
+
 //    /**
 //     * @return Product[] Returns an array of Product objects
 //     */

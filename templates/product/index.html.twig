@@ -37,21 +37,21 @@
                     </div>
                     <div class="modal-body">
                         <div class="m-2 text-center">
+                            <!-- Este botón es para exportar a PDF 
                             <button type="button" class="btn btn-outline-primary">
                                 <i class="bi bi-printer"></i>
-                            </button>
-                            <button type="button" class="btn btn-outline-success">
+                            </button> -->
+                            <button type="button" class="btn btn-outline-success" onclick="products_xlsx()">
                                 <i class="bi bi-file-earmark-excel"></i>
                             </button>
                         </div>
                         <div class="m-2 text-center">
                             <label for="">Envía el Archivo por Correo Electrónico</label>
-                            <input type="email" id="product-export-email" name="email" class="form-control">
+                            <input type="email" id="product-export-email" name="email" form="frmSrchProducts" class="form-control">
                         </div>
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
-                        <button type="button" class="btn btn-primary" onclick="window.location.href=`product/delete/`+document.getElementById('prod-id-delete').value;">Aceptar</button>
                     </div>
                 </div>
             </div>
@@ -207,6 +207,11 @@
             function export_product(){
                 var Modal = new bootstrap.Modal(document.getElementById('msgExportProduct'));
                 Modal.show();
+            }
+            function products_xlsx(){
+                document.getElementById('frmSrchProducts').setAttribute('action','{{ path('excel_product') }}');
+                document.getElementById("frmSrchProducts").submit();
+                document.getElementById('frmSrchProducts').setAttribute('action','{{ path('app_product') }}');
             }
         </script>
     </div>

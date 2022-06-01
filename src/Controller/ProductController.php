@@ -10,7 +10,12 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use App\Form\NewProductType;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Mailer\Exception\TransportExceptionInterface;
+use Symfony\Component\Mailer\MailerInterface;
 use Symfony\Component\Routing\Annotation\Route;
+use PhpOffice\PhpSpreadsheet\Spreadsheet;
+use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
+use Symfony\Component\Mime\Email;
 
 class ProductController extends AbstractController
 {
@@ -106,5 +111,57 @@ class ProductController extends AbstractController
             return $this->redirectToRoute('app_product');
         }
         return $this->renderForm('product/new.html.twig',['form'=>$form]);
+    }
+    //CONSTRUIMOS EL ARCHIVO EN EXCEL
+    #[Route('/products/export/xlsx', name: 'excel_product',methods: ['GET','POST'])]
+    public function xlsx(Request $request, ProductRepository $repo, MailerInterface $mailer): Response
+    {
+        $prods=$repo->getProductExport($request);
+
+        $spreadsheet = new Spreadsheet();
+        $sheet = $spreadsheet->getActiveSheet();
+
+        $sheet->setCellValue('A1', 'Código');
+        $sheet->setCellValue('B1', 'Nombre');
+        $sheet->setCellValue('C1', 'Descripción');
+        $sheet->setCellValue('D1', 'Marca');
+        $sheet->setCellValue('E1', 'Categoria');
+        $sheet->setCellValue('F1', 'Precio');
+        $sheet->setCellValue('G1', 'Estado');
+
+        $linea=2;
+        foreach ($prods as $prod){
+            $cat=$prod->getCategory();
+            $sheet->setCellValue('A'.$linea, $prod->getCode());
+            $sheet->setCellValue('B'.$linea, $prod->getName());
+            $sheet->setCellValue('C'.$linea, $prod->getDescription());
+            $sheet->setCellValue('D'.$linea, $prod->getBrand());
+            $sheet->setCellValue('E'.$linea, $cat->getName());
+            $sheet->setCellValue('F'.$linea, $prod->getPrice());
+            $sheet->setCellValue('G'.$linea, (($prod->getActive()==1)?'Activo':'Inactivo'));
+            $linea++;
+        }
+
+        $writer = new Xlsx($spreadsheet);
+        if ($request->get('email')==''){
+            header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+            header('Content-Disposition: attachment; filename="'. urlencode('Products.xlsx').'"');
+            $writer->save('php://output');
+        }else{
+            $writer->save('files/Product.xlsx');
+            $email = (new Email())
+                ->from('taoh75.pruebas@gmail.com')
+                ->to($request->get('email'))
+                ->subject('Lista de Productos')
+                ->text('Se adjunta lista de Productos')
+                ->html('<h3>CATPROD 1.0</h3><p>Adjuntamos lista de Productos a solicitud del usuario</p>')
+                ->attachFromPath('/files/Product.xlsx');
+            try {
+                $mailer->send($email);
+            } catch (TransportExceptionInterface $e) {
+                return new Response(json_encode($e,JSON_PRETTY_PRINT),200);
+            }
+        }
+        return new Response("<script>history.back();</script>",200);
     }
 }
